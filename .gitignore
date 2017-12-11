@@ -1,6 +1,6 @@
 *.scvd
-./DebugConfig
-./Listings
-./Objects
-./RTEe
+DebugConfig/
+Listings/
+Objects/
+RTE/
 SPITest*
