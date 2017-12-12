@@ -81,18 +81,8 @@ int main(void)
 	
 	/* Enable SPIy */
   SPI_Cmd(SPIy, ENABLE);
-	//SPI1_ReadWriteByte(0xff);
-	
-	
-	/*
-	while (1) 
-	{
-		GPIO_SetBits(GPIOC, GPIO_Pin_13);
-		DelayMs(500);
-		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-		DelayMs(500);
-	}
-	*/
+	SI4432_init();
+
 
   while (1)
   {
@@ -102,41 +92,16 @@ int main(void)
 
 void SI4432_init(void)
 {		
-	//write
-	/*
-	while (SPI_I2S_GetFlagStatus(SPIy, SPI_I2S_FLAG_TXE) == RESET);
-	GPIO_ResetBits(GPIOA, nSEL);
-  SPI_I2S_SendData(SPIy, (0x06|0x80) << 8 | 0x00);
-	GPIO_SetBits(GPIOA, nSEL);
-	DelayMs(10);
-	*/
+	u8 ItStatus1 = SI4432_ReadReg(0x03);
+	u8 ItStatus2 = SI4432_ReadReg(0x04);
 	
-	//read
-	while (1) 
-	{
-		while (SPI_I2S_GetFlagStatus(SPIy, SPI_I2S_FLAG_TXE) == RESET);
-		/*
-		GPIO_ResetBits(GPIOA, nSEL);
-		DelayMs(10);	// RF module reset
-		*/
-		SPI_I2S_SendData(SPIy, 0x00 << 8);
-		
-		while (SPI_I2S_GetFlagStatus(SPIy, SPI_I2S_FLAG_RXNE) == RESET);
-		test = SPI_I2S_ReceiveData(SPIy);
-		
-		
-		/*
-		DelayMs(10);	// RF module reset
-		GPIO_SetBits(GPIOA, nSEL);
-		DelayMs(10);
-		*/
-		
-	}
+	SI4432_WriteReg(0x06, 0x00);
+	test = SI4432_ReadReg(0x06);
+	
+	SI4432_WriteReg(0x06, 0x01);
+	test = SI4432_ReadReg(0x06);
 	
 	
-	
-	//while (SPI_I2S_GetFlagStatus(SPIy, SPI_I2S_FLAG_RXNE) == RESET);
-	//test = SPI_I2S_ReceiveData(SPIy);
 
 }
 
@@ -237,11 +202,10 @@ void SI4432_WriteReg(u8 addr, u8 value)
 {
 		uint8_t temp = 0;
 		GPIO_ResetBits(GPIOA, nSEL);
-		//SI4432_NSEL = 0;
+		
 		SPI1_ReadWriteByte(addr | 0x80);    //?????????
 		SPI1_ReadWriteByte(value);
 		GPIO_SetBits(GPIOA, nSEL);
-		//SI4432_NSEL = 1;
 }
 
 
