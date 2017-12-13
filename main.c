@@ -107,7 +107,7 @@ int main(void)
 		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 		DelayMs(500);
 		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-		DelayMs(5000);
+		DelayMs(3000);
 	}
 	
 	
