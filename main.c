@@ -33,7 +33,8 @@
 #define  SI4432_PWRSTATE_TX		0x09	
 #define  SI4432_Rx_packet_received_interrupt   0x02
 #define  SI4432_PACKET_SENT_INTERRUPT	04
-const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};  
+const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d}; 
+unsigned char rx_buf[15];
 
 typedef struct 
 {
@@ -100,7 +101,7 @@ int main(void)
 	SI4432_init();
 	TX0_RX0;
 	
-	/* code for tx data */
+	/* code for tx data 
 	while (1) 
 	{
 		tx_data();
@@ -109,13 +110,37 @@ int main(void)
 		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
 		DelayMs(5000);
 	}
+	*/
+	
+	rx_data();
+	
+	while (1)
+	{
+		if(!GPIO_ReadInputDataBit(GPIOA, nIRQ)) 
+		{
+			//nIRQ is low.
+			ItStatus1 = SI4432_ReadReg(0x03);		
+			ItStatus2 = SI4432_ReadReg(0x04);		
+			
+			//burst read
+			GPIO_ResetBits(GPIOA, nSEL);
+			SPI1_ReadWriteByte(0x7F);
+			for (int i = 0; i < 10; i++) 
+			{
+				rx_buf[i] = SPI1_ReadWriteByte(0xFF);
+			}
+			GPIO_SetBits(GPIOA, nSEL);
+			//enter ready mode
+			SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+       //If you want to enter receive mode. You need to do all the configuration again
+		}
+			
+		
+	}
 	
 	
 
-//  while (1)
-  //{
-		//test = SI4432_ReadReg(0x00);
-	//}
+
 }
 
 void SI4432_init(void)
