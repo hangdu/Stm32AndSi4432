@@ -24,14 +24,16 @@
 #include "platform_config.h"
 #include "delay.h"
 
-#define SI4432_PWRSTATE_READY		01
+#define  SI4432_PWRSTATE_READY		01
 #define  TX1_RX0	SI4432_WriteReg(0x0e, 0x01)		// TX status
 #define  TX0_RX1	SI4432_WriteReg(0x0e, 0x02)		// RX status
 #define  TX0_RX0	SI4432_WriteReg(0x0e, 0x00)         // not TX status and not RX status
-#define  SI4432_PACKET_SENT_INTERRUPT	04
-#define  SI4432_PWRSTATE_TX		0x09	
-const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};  
 
+#define  SI4432_PWRSTATE_RX		05
+#define  SI4432_PWRSTATE_TX		0x09	
+#define  SI4432_Rx_packet_received_interrupt   0x02
+#define  SI4432_PACKET_SENT_INTERRUPT	04
+const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};  
 
 typedef struct 
 {
@@ -43,6 +45,9 @@ FlagType Flag;
 
 /* Private typedef -----------------------------------------------------------*/
 typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+
+u8 ItStatus1;
+u8 ItStatus2;
 
 /* Private define ------------------------------------------------------------*/
 #define BufferSize 32
@@ -62,6 +67,7 @@ u8 SPI1_ReadWriteByte(u8 TxData);
 u8 SI4432_ReadReg(u8 addr);
 void SI4432_WriteReg(u8 addr, u8 value);
 void tx_data(void);
+void rx_data(void);
 																																																							
 /**
   * @brief  Main program
@@ -94,19 +100,28 @@ int main(void)
 	SI4432_init();
 	TX0_RX0;
 	
-	tx_data();
-
-
-  while (1)
-  {
-		test = SI4432_ReadReg(0x00);
+	/* code for tx data */
+	while (1) 
+	{
+		tx_data();
+		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+		DelayMs(500);
+		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+		DelayMs(5000);
 	}
+	
+	
+
+//  while (1)
+  //{
+		//test = SI4432_ReadReg(0x00);
+	//}
 }
 
 void SI4432_init(void)
 {		
-	u8 ItStatus1 = SI4432_ReadReg(0x03);
-	u8 ItStatus2 = SI4432_ReadReg(0x04);
+	ItStatus1 = SI4432_ReadReg(0x03);
+	ItStatus2 = SI4432_ReadReg(0x04);
 	
 	//unable all the interrupts that are not needed	
 	SI4432_WriteReg(0x06, 0x00);
@@ -262,8 +277,8 @@ void tx_data(void)
 		SI4432_WriteReg(0x7f, tx_test_data[i]); 	// ????????????
 	}
 	SI4432_WriteReg(0x05, SI4432_PACKET_SENT_INTERRUPT);	// Enable Packet Sent Interrupt
-	u8 ItStatus1 = SI4432_ReadReg(0x03);		
-	u8 ItStatus2 = SI4432_ReadReg(0x04);
+	ItStatus1 = SI4432_ReadReg(0x03);		
+	ItStatus2 = SI4432_ReadReg(0x04);
 	
 	test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_TX);  // ??????
@@ -298,29 +313,29 @@ void tx_data(void)
 }
 
 
-/*
+
 void rx_data(void)
 {	
 	unsigned char i, chksum;
 	Flag.is_tx = 0;
 	
-	spi_rw(0x07|0x80, SI4432_PWRSTATE_READY);	//?? Ready ??
-	delay_1ms(5);		//
+	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	//Ready Mode
+	DelayMs(5);		
 
-	TX0_RX1;		// ??????
+	TX0_RX1;		
 	
-	spi_rw(0x08|0x80, 0x03);  //???,?????
-	spi_rw(0x08|0x80, 0x00);  //???,?????
+	//clear the contents of the RX FIFO
+  //clear the contents of the TX FIFO.
+	SI4432_WriteReg(0x08, 0x03);  
+	SI4432_WriteReg(0x08, 0x00);  
+
+	SI4432_WriteReg(0x05, SI4432_Rx_packet_received_interrupt);  // Valid Packet Received Interrupt is enabled		
+	ItStatus1 = SI4432_ReadReg(0x03);		
+	ItStatus2 = SI4432_ReadReg(0x04);	
 		
-	spi_rw(0x07|0x80,SI4432_PWRSTATE_RX );  // RF ????????
-	
-	spi_rw(0x05|0x80, SI4432_Rx_packet_received_interrupt);  // Valid Packet Received Interrupt is enabled
-		
-	ItStatus1 = spi_rw(0x03,0x00);		//?????????
-	ItStatus2 = spi_rw(0x04,0x00);		//?????????
-		
+	SI4432_WriteReg(0x07,SI4432_PWRSTATE_RX);  // RF enter receive mode
 }
-*/
+
 
 
 /**
