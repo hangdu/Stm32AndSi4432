@@ -113,9 +113,12 @@ int main(void)
 	*/
 	
 	rx_data();
+	unsigned char chksum;
+	unsigned char i;
 	
 	while (1)
 	{
+		
 		if(!GPIO_ReadInputDataBit(GPIOA, nIRQ)) 
 		{
 			//nIRQ is low.
@@ -133,10 +136,28 @@ int main(void)
 			//enter ready mode
 			SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
        //If you want to enter receive mode. You need to do all the configuration again
-		}
 			
-		
+			chksum = 0;
+			for(i=0;i<9;i++)
+			{
+				chksum += rx_buf[i];  
+			}	
+			if((chksum == rx_buf[9] )&&( rx_buf[0] == 0x41 ))    					
+     	{    
+        //data is right.				
+     		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+				DelayMs(500);
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+				rx_data();
+      } 
+			else 
+			{
+				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+				break;
+			}						        	        				    				
+		}		
 	}
+	while(1);
 	
 	
 
