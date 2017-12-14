@@ -59,6 +59,7 @@ SPI_InitTypeDef   SPI_InitStructure;
 __IO uint8_t TxIdx = 0, RxIdx = 0, k = 0;
 																			
 u8 test = 0x20;
+u8 RSSI;
 
 /* Private functions ---------------------------------------------------------*/
 void SI4432_init(void);
@@ -112,56 +113,26 @@ int main(void)
 	}
 	*/
 	
-	rx_data();
 	unsigned char chksum;
 	unsigned char i;
 	
+	rx_data();
+	SI4432_WriteReg(0x06, 0x40);	// Register 06h. Interrupt Enable 2 :   Enable Valid Preamble Detected.
+	
 	while (1)
 	{
-		
 		if(!GPIO_ReadInputDataBit(GPIOA, nIRQ)) 
 		{
+			//read RSSI first
+			RSSI = SI4432_ReadReg(0x26);
 			//nIRQ is low.
 			ItStatus1 = SI4432_ReadReg(0x03);		
 			ItStatus2 = SI4432_ReadReg(0x04);		
 			
-			//burst read
-			GPIO_ResetBits(GPIOA, nSEL);
-			SPI1_ReadWriteByte(0x7F);
-			for (int i = 0; i < 10; i++) 
-			{
-				rx_buf[i] = SPI1_ReadWriteByte(0xFF);
-			}
-			GPIO_SetBits(GPIOA, nSEL);
-			//enter ready mode
-			SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
-       //If you want to enter receive mode. You need to do all the configuration again
-			
-			chksum = 0;
-			for(i=0;i<9;i++)
-			{
-				chksum += rx_buf[i];  
-			}	
-			if((chksum == rx_buf[9] )&&( rx_buf[0] == 0x41 ))    					
-     	{    
-        //data is right.				
-     		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-				DelayMs(500);
-				GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-				rx_data();
-      } 
-			else 
-			{
-				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-				break;
-			}						        	        				    				
+			ItStatus1 = SI4432_ReadReg(0x03);		
+			ItStatus2 = SI4432_ReadReg(0x04);		
 		}		
 	}
-	while(1);
-	
-	
-
-
 }
 
 void SI4432_init(void)
@@ -375,7 +346,7 @@ void rx_data(void)
 	SI4432_WriteReg(0x08, 0x03);  
 	SI4432_WriteReg(0x08, 0x00);  
 
-	SI4432_WriteReg(0x05, SI4432_Rx_packet_received_interrupt);  // Valid Packet Received Interrupt is enabled		
+	//SI4432_WriteReg(0x05, SI4432_Rx_packet_received_interrupt);  // Valid Packet Received Interrupt is enabled		
 	ItStatus1 = SI4432_ReadReg(0x03);		
 	ItStatus2 = SI4432_ReadReg(0x04);	
 		
