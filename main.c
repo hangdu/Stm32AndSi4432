@@ -127,10 +127,10 @@ int main(void)
 			RSSI = SI4432_ReadReg(0x26);
 			//nIRQ is low.
 			ItStatus1 = SI4432_ReadReg(0x03);		
-			ItStatus2 = SI4432_ReadReg(0x04);		
-			
-			ItStatus1 = SI4432_ReadReg(0x03);		
-			ItStatus2 = SI4432_ReadReg(0x04);		
+			ItStatus2 = SI4432_ReadReg(0x04);	
+
+			SI4432_WriteReg(0x06, 0x40);
+			rx_data();
 		}		
 	}
 }
