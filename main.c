@@ -33,7 +33,7 @@
 #define  SI4432_PWRSTATE_TX		0x09	
 #define  SI4432_Rx_packet_received_interrupt   0x02
 #define  SI4432_PACKET_SENT_INTERRUPT	04
-const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};  
+const unsigned char tx_test_data[2] = {0x41,0x42};  
 
 typedef struct 
 {
@@ -272,7 +272,7 @@ void tx_data(void)
 	
 	SI4432_WriteReg(0x34, 40);  // 0x34: set Preamble Length=20bytes
 	SI4432_WriteReg(0x3e, 10);  // 0x3e: Packet Length=10bytes
-  for (i = 0; i<10; i++)
+  for (i = 0; i<2; i++)
 	{
 		SI4432_WriteReg(0x7f, tx_test_data[i]); 	// ????????????
 	}
