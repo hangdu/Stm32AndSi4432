@@ -235,6 +235,7 @@ void SI4432_init(void)
 	test = SI4432_ReadReg(0x7a);
 	
 	
+	/*
 	SI4432_WriteReg(0x71, 0x22); // ????? CLK,FiFo , FSK??  0x71: Modulation Mode Control 2
                                   //No TX Data CLK is available (asynchronous mode – Can only work with modulations FSK or OOK)		
 	test = SI4432_ReadReg(0x71);
@@ -246,12 +247,21 @@ void SI4432_init(void)
 	SI4432_WriteReg(0x74, 0x0);  // ??????  0x74:Frequency Offset 2
 	test = SI4432_ReadReg(0x74);
 	
+	
 	SI4432_WriteReg(0x75, 0x53);  // ???? 434  0x75: Frequency Band Select
 	test = SI4432_ReadReg(0x75);
 	SI4432_WriteReg(0x76, 0x64);  // 0x76: Nominal Carrier Frequency
 	test = SI4432_ReadReg(0x76);
 	SI4432_WriteReg(0x77, 0x00);   // 0x77: Nominal Carrier Frequency
 	test = SI4432_ReadReg(0x77);
+	*/
+	
+	SI4432_WriteReg(0x70, 0x24);
+	SI4432_WriteReg(0x71, 0x2A);
+	SI4432_WriteReg(0x72, 0x30);
+	SI4432_WriteReg(0x75, 0x75);
+	SI4432_WriteReg(0x76, 0xBB);
+	SI4432_WriteReg(0x77, 0x80);
 }
 
 
