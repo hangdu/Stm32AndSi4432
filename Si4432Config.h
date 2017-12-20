@@ -14,6 +14,8 @@
 #endif
 
 #include "stm32f10x.h"
+#include "platform_config.h"
+#include "delay.h"
 #define  SI4432_PWRSTATE_READY		01
 #define  TX1_RX0	SI4432_WriteReg(0x0e, 0x01)		// TX status
 #define  TX0_RX1	SI4432_WriteReg(0x0e, 0x02)		// RX status
@@ -40,6 +42,7 @@ void SI4432_WriteReg(u8 addr, u8 value);
 void tx_data(void);
 void rx_data(void);
 void SI4432_init(void);
+
 
 
 #ifdef __cplusplus

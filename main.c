@@ -22,8 +22,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x.h"
 #include "platform_config.h"
-#include "delay.h"
 #include "Si4432Config.h"
+#include "delay.h"
 
 unsigned char rx_buf[15];
 /* Private typedef -----------------------------------------------------------*/
@@ -41,6 +41,9 @@ u8 test = 0x20;
 
 void RCC_Configuration(void);
 void GPIO_Configuration(uint16_t SPIy_Mode);
+void EXTI_Configuration(void);
+void NVIC_Configuration(void);
+
 																																															
 /**
   * @brief  Main program
@@ -54,7 +57,7 @@ int main(void)
   /* GPIO configuration ------------------------------------------------------*/
   GPIO_Configuration(SPI_Mode_Master);
 	
-  DelayInit();
+
 	
   /* SPIy Config -------------------------------------------------------------*/
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -70,26 +73,23 @@ int main(void)
 	
 	/* Enable SPIy */
   SPI_Cmd(SPIy, ENABLE);
+	
+	
+	
 	SI4432_init();
 	TX0_RX0;
-	
-	/* code for tx data 
-	while (1) 
-	{
-		tx_data();
-		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-		DelayMs(500);
-		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-		DelayMs(5000);
-	}
-	*/
+
 	
 	rx_data();
+	
+	EXTI_Configuration();
+	NVIC_Configuration();
 	unsigned char chksum;
 	unsigned char i;
-	
+	/*
 	while (1)
 	{
+		
 		if(!GPIO_ReadInputDataBit(GPIOA, nIRQ)) 
 		{
 			//nIRQ is low.
@@ -126,9 +126,15 @@ int main(void)
 				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 				break;
 			}						        	        				    				
-		}		
+		}	
+	
 	}
-	while(1);
+	*/
+	
+	while(1)
+	{
+	
+	}
 }
 
 /**
@@ -146,6 +152,7 @@ void RCC_Configuration(void)
 	/* GPIOC clock enable (For testing LED use) */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
 }
+
 
 /**
   * @brief  Configures the different SPIy and SPIz GPIO ports.
@@ -186,6 +193,32 @@ void GPIO_Configuration(uint16_t SPIy_Mode)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
+
+void NVIC_Configuration(void) 
+{
+	NVIC_InitTypeDef NVIC_InitStructure;
+	
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
+	NVIC_InitStructure.NVIC_IRQChannel = EXTI1_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);
+}
+
+void EXTI_Configuration(void) 
+{	
+	EXTI_ClearITPendingBit(EXTI_Line1);
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOA, GPIO_PinSource1);
+	
+	EXTI_InitTypeDef EXTI_InitStructure;
+	EXTI_InitStructure.EXTI_Line = EXTI_Line1;
+	EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Falling;
+	EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+	EXTI_Init(&EXTI_InitStructure);
+}
+
 
 #ifdef  USE_FULL_ASSERT
 

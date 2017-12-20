@@ -1,6 +1,5 @@
 #include "Si4432Config.h"
-#include "platform_config.h"
-#include "delay.h"
+
 const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};
 FlagType Flag;
 
@@ -51,7 +50,7 @@ void tx_data(void)
 	Flag.is_tx = 1;
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	// rf Ready mode
 	TX1_RX0;		//TX status
-	DelayMs(5);		// ?? 5ms, ?????
+	delay_ms(5);
 	
 	
   //clear the contents of the RX FIFO
@@ -109,7 +108,7 @@ void rx_data(void)
 	Flag.is_tx = 0;
 	
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	//Ready Mode
-	DelayMs(5);		
+	delay_ms(5);
 
 	TX0_RX1;		
 	
