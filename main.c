@@ -277,7 +277,7 @@ void SI4432_init(void)
 	SI4432_WriteReg(0x72, 0x30);
 	SI4432_WriteReg(0x75, 0x75);
 	SI4432_WriteReg(0x76, 0xBB);
-	SI4432_WriteReg(0x77, 0x280);
+	SI4432_WriteReg(0x77, 0x80);
 }
 
 
