@@ -101,9 +101,10 @@ int main(void)
 	TX0_RX0;
 	
 	/* code for tx data */
-	while (1) 
-	{
+	
 		tx_data();
+		
+		
 		rx_data();
 		while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
 		ItStatus1 = SI4432_ReadReg(0x03);		//?????????
@@ -114,28 +115,22 @@ int main(void)
 		//burst read
 		GPIO_ResetBits(GPIOA, nSEL);
 		SPI1_ReadWriteByte(0x7F);
-		char rx_buf[10];
+		char rx_buf1[10];
 		for (int i = 0; i < 10; i++) 
 		{
-			rx_buf[i] = SPI1_ReadWriteByte(0xFF);
+			rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
 		}
 		GPIO_SetBits(GPIOA, nSEL);
 		//enter ready mode
 		SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+		
 		
 
 		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 		DelayMs(500);
 		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
 		DelayMs(3000);
-	}
-	
-	
 
-//  while (1)
-  //{
-		//test = SI4432_ReadReg(0x00);
-	//}
 }
 
 void SI4432_init(void)
