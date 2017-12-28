@@ -9,7 +9,7 @@
 #include "stm32f10x_usart.h"
 
 void USART1_Init(void);
-void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount);
+void UARTSend(char *pucBuffer, unsigned long ulCount);
 
 #ifdef __cplusplus
 }

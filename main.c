@@ -110,6 +110,8 @@ int main(void)
 		delay_ms(500);
 		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
 		delay_ms(3000);
+		
+		while(1);
 }
 
 /**

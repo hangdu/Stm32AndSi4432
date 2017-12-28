@@ -23,6 +23,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "Si4432Config.h"
 
 /** @addtogroup STM32F10x_StdPeriph_Template
   * @{
@@ -56,14 +57,41 @@ void USART1_IRQHandler(void)
         int i = USART_ReceiveData(USART1);
         if(i == '1'){
             GPIO_WriteBit(GPIOA,GPIO_Pin_8,Bit_SET);        // Set '1' on PA8
-					  const unsigned char test[] = "LED ON\r\n";
+					  char test[] = "LED ON\r\n";
             UARTSend(test,sizeof(test));    // Send message to UART1
         }
         else if(i == '0'){
             GPIO_WriteBit(GPIOA,GPIO_Pin_8,Bit_RESET);      // Set '0' on PA8
-					  const unsigned char test[] = "LED OFF\r\n";
+					  char test[] = "LED OFF\r\n";
             UARTSend(test,sizeof(test));			
         }
+				
+				else if(i == '2'){
+            
+						tx_data();	
+						rx_data();
+						while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
+						u8 ItStatus1 = SI4432_ReadReg(0x03);		//?????????
+						u8 ItStatus2 = SI4432_ReadReg(0x04);		//?????????
+						//burst read
+						GPIO_ResetBits(GPIOA, nSEL);
+						SPI1_ReadWriteByte(0x7F);
+						char rx_buf1[10];
+						for (int i = 0; i < 10; i++) 
+						{
+							rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
+						}
+						GPIO_SetBits(GPIOA, nSEL);
+						//enter ready mode
+						SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+						GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+						delay_ms(500);
+						GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+						delay_ms(3000);
+					 
+            UARTSend(rx_buf1,sizeof(rx_buf1));			
+        }
+				
     }
 }
 

@@ -61,7 +61,7 @@ void USART1_Init(void)
 * Input          : - pucBuffer: buffers to be printed.
 *                : - ulCount  : buffer's length
 *******************************************************************************/
-void UARTSend(const unsigned char *pucBuffer, unsigned long ulCount)
+void UARTSend(char *pucBuffer, unsigned long ulCount)
 {
     //
     // Loop while there are more characters to send.
