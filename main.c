@@ -23,6 +23,7 @@
 #include "stm32f10x.h"
 #include "platform_config.h"
 #include "delay.h"
+#include "UartConfiguration.h"
 
 #define  SI4432_PWRSTATE_READY		01
 #define  TX1_RX0	SI4432_WriteReg(0x0e, 0x01)		// TX status
@@ -82,6 +83,8 @@ int main(void)
   GPIO_Configuration(SPI_Mode_Master);
 	
   DelayInit();
+	USART1_Init();
+	
 	
   /* SPIy Config -------------------------------------------------------------*/
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -102,16 +105,11 @@ int main(void)
 	
 	/* code for tx data */
 	
-		tx_data();
-		
-		
+		tx_data();	
 		rx_data();
 		while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
 		ItStatus1 = SI4432_ReadReg(0x03);		//?????????
 		ItStatus2 = SI4432_ReadReg(0x04);		//?????????
-		
-		
-		
 		//burst read
 		GPIO_ResetBits(GPIOA, nSEL);
 		SPI1_ReadWriteByte(0x7F);
@@ -123,9 +121,6 @@ int main(void)
 		GPIO_SetBits(GPIOA, nSEL);
 		//enter ready mode
 		SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
-		
-		
-
 		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 		DelayMs(500);
 		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
