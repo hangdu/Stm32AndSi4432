@@ -8,43 +8,21 @@
 	
 #include "delay.h"
 
-// For store tick counts in us
-static __IO uint32_t usTicks;
-
-// SysTick_Handler function will be called every 1 us
-void SysTick_Handler()
+void delay_ms(u32 nus)
 {
-	if (usTicks != 0)
-	{
-		usTicks--;
-	}
+	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);
+	SysTick_SetReload(9000*nus);
+	SysTick_ITConfig(DISABLE);
+	SysTick_CounterCmd(SysTick_Counter_Enable);
+	
+	while(RESET == SysTick_GetFlagStatus(SysTick_FLAG_COUNT));
+	SysTick_CounterCmd(SysTick_Counter_Disable);
 }
 
-void DelayInit()
-{
-	// Update SystemCoreClock value
-	SystemCoreClockUpdate();
-	// Configure the SysTick timer to overflow every 1 us
-	SysTick_Config(SystemCoreClock / 1000000);
-}
 
-void DelayUs(uint32_t us)
-{
-	// Reload us value
-	usTicks = us;
-	// Wait until usTick reach zero
-	while (usTicks);
-}
 
-void DelayMs(uint32_t ms)
-{
-	// Wait until ms reach zero
-	while (ms--)
-	{
-		// Delay 1ms
-		DelayUs(1000);
-	}
-}
+
+
 
 /********************************* END OF FILE ********************************/
 /******************************************************************************/

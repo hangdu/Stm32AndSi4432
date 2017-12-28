@@ -14,10 +14,9 @@
 #endif
 
 #include "stm32f10x.h"
+#include "stm32f10x_systick.h"
 
-void DelayInit(void);
-void DelayUs(uint32_t us);
-void DelayMs(uint32_t ms);
+void delay_ms(u32 nus);
 
 #ifdef __cplusplus
 }
