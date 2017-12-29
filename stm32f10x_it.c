@@ -45,6 +45,27 @@
 /*            STM32F10x Peripherals Interrupt Handlers                        */
 /******************************************************************************/
   
+void TIM2_IRQHandler()
+{
+    if (TIM_GetITStatus(TIM2, TIM_IT_Update) != RESET)
+    {
+        TIM_ClearITPendingBit(TIM2, TIM_IT_Update);
+			/*
+        if (GPIO_ReadOutputDataBit(GPIOC, GPIO_Pin_13) == 1) 
+        {
+          GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+        } 
+        else 
+        {
+          GPIO_SetBits(GPIOC, GPIO_Pin_13);
+        }
+        */
+				Flag.reach_1s = 1;
+        TIM_Cmd(TIM2, DISABLE);
+        TIM_SetCounter(TIM2, 9000);
+    }
+}
+
 /**
   * @brief  This function handles USARTx global interrupt request
   * @param  None
@@ -66,9 +87,10 @@ void USART1_IRQHandler(void)
             UARTSend(test,sizeof(test));			
         }
 				
-				else if(i == '2'){
-            
-						tx_data();	
+				else if(i == '2'){            
+					u8 returnValue = tx_data();	
+					if (returnValue == 1)
+					{
 						rx_data();
 						while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
 						u8 ItStatus1 = SI4432_ReadReg(0x03);		//?????????
@@ -88,10 +110,8 @@ void USART1_IRQHandler(void)
 						delay_ms(500);
 						GPIO_SetBits(GPIOC, GPIO_Pin_13);	
 						delay_ms(3000);
-					 
-            UARTSend(rx_buf1,sizeof(rx_buf1));			
-        }
-				
+					}		
+        }			
     }
 }
 

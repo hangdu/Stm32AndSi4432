@@ -44,7 +44,7 @@ void SI4432_WriteReg(u8 addr, u8 value)
 		GPIO_SetBits(GPIOA, nSEL);
 }
 
-void tx_data(void)
+u8 tx_data(void)
 {
 	unsigned char i;
 	u8 ItStatus1;
@@ -53,8 +53,7 @@ void tx_data(void)
 	Flag.is_tx = 1;
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	// rf Ready mode
 	TX1_RX0;		//TX status
-	delay_ms(5);		// ?? 5ms, ?????
-	
+	delay_ms(5);		
 	
   //clear the contents of the RX FIFO
   //clear the contents of the TX FIFO.
@@ -65,7 +64,7 @@ void tx_data(void)
 	SI4432_WriteReg(0x3e, 10);  // 0x3e: Packet Length=10bytes
   for (i = 0; i<10; i++)
 	{
-		SI4432_WriteReg(0x7f, tx_test_data[i]); 	// ????????????
+		SI4432_WriteReg(0x7f, tx_test_data[i]); 	
 	}
 	SI4432_WriteReg(0x05, SI4432_PACKET_SENT_INTERRUPT);	// Enable Packet Sent Interrupt
 	ItStatus1 = SI4432_ReadReg(0x03);		
@@ -73,35 +72,30 @@ void tx_data(void)
 	
 	test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_TX);  // ??????
-	/*
-	rf_timeout = 0;
-	Flag.rf_reach_timeout = 0;
-	while(nIRQ)		// ????
-	{
-		
-		if(Flag.rf_reach_timeout)
+	
+	
+	Flag.reach_1s = 0;
+	TIM_Cmd(TIM2, ENABLE);
+	while(GPIO_ReadInputDataBit(GPIOA, nIRQ))
+	{		
+		if(Flag.reach_1s)
 		{
-			
-			SDN  = 1;		//??0.5??????,?RF???????,??????????
-			delay_1ms(10);
-			SDN = 0;
-			delay_1ms(200);
-			
-			SI4432_init();
-			break;		// ?????
-		}
-			
+			Flag.reach_1s = 0;
+			char str[] = "Error: tx data timeout!";
+			UARTSend(str, sizeof(str));
+			return 0;
+		}		
 	}	
-  	rx_data();		//rf ????,??????
-		*/
+  	
 		//waiting for interrupt
-		while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
-		test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
+		//while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
+		//test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
 		//tx finished, nIRQ is low.
-		test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
-		ItStatus1 = SI4432_ReadReg(0x03);		//?????????
-		ItStatus2 = SI4432_ReadReg(0x04);		//?????????
-		test = GPIO_ReadInputDataBit(GPIOA, nIRQ);	
+		//test = GPIO_ReadInputDataBit(GPIOA, nIRQ);
+	ItStatus1 = SI4432_ReadReg(0x03);		//?????????
+	ItStatus2 = SI4432_ReadReg(0x04);		//?????????
+	test = GPIO_ReadInputDataBit(GPIOA, nIRQ);	
+	return 1;
 }
 
 

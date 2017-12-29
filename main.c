@@ -25,6 +25,7 @@
 #include "delay.h"
 #include "UartConfiguration.h"
 #include "Si4432Config.h"
+#include "Timer2Configuration.h"
 #define  SI4432_PWRSTATE_READY		01
 #define  TX1_RX0	SI4432_WriteReg(0x0e, 0x01)		// TX status
 #define  TX0_RX1	SI4432_WriteReg(0x0e, 0x02)		// RX status
@@ -69,6 +70,7 @@ int main(void)
   GPIO_Configuration(SPI_Mode_Master);
 	
 	USART1_Init();
+	Timer2Init();
 	
 	
   /* SPIy Config -------------------------------------------------------------*/
@@ -90,26 +92,30 @@ int main(void)
 	
 	/* code for tx data */
 	
-		tx_data();	
-		rx_data();
-		while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
-		ItStatus1 = SI4432_ReadReg(0x03);		//?????????
-		ItStatus2 = SI4432_ReadReg(0x04);		//?????????
-		//burst read
-		GPIO_ResetBits(GPIOA, nSEL);
-		SPI1_ReadWriteByte(0x7F);
-		char rx_buf1[10];
-		for (int i = 0; i < 10; i++) 
+		u8 returnValue = tx_data();	
+		if (returnValue == 1)
 		{
-			rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
+			rx_data();
+			while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
+			ItStatus1 = SI4432_ReadReg(0x03);		//?????????
+			ItStatus2 = SI4432_ReadReg(0x04);		//?????????
+			//burst read
+			GPIO_ResetBits(GPIOA, nSEL);
+			SPI1_ReadWriteByte(0x7F);
+			char rx_buf1[10];
+			for (int i = 0; i < 10; i++) 
+			{
+				rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
+			}
+			GPIO_SetBits(GPIOA, nSEL);
+			//enter ready mode
+			SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+			GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+			delay_ms(500);
+			GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+			delay_ms(3000);
 		}
-		GPIO_SetBits(GPIOA, nSEL);
-		//enter ready mode
-		SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
-		GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-		delay_ms(500);
-		GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-		delay_ms(3000);
+		
 		
 		while(1);
 }
