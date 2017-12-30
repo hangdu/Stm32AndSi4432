@@ -8,6 +8,8 @@
 #include "stm32f10x.h"
 
 void Timer2Init();
+void Timer3Init();
+
 
 #ifdef __cplusplus
 }

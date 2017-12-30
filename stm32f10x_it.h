@@ -36,6 +36,7 @@
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
 void TIM2_IRQHandler();
+void TIM3_IRQHandler();
 void USART1_IRQHandler(void);
 void NMI_Handler(void);
 void HardFault_Handler(void);

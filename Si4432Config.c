@@ -3,6 +3,7 @@
 //const unsigned char tx_test_data[10] = {0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6d};
 unsigned char tx_test_data[10] = {0x41,0x43,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x6e};
 FlagType Flag;
+char rx_buf1[10];
 
 
 u8 SPI1_ReadWriteByte(u8 TxData)
@@ -99,7 +100,7 @@ u8 tx_data(void)
 }
 
 
-void rx_data(void)
+u8 rx_data(void)
 {	
 	unsigned char i, chksum;
 	Flag.is_tx = 0;
@@ -119,6 +120,34 @@ void rx_data(void)
 	u8 ItStatus2 = SI4432_ReadReg(0x04);	
 		
 	SI4432_WriteReg(0x07,SI4432_PWRSTATE_RX);  // RF enter receive mode
+	
+	Flag.reach_1s = 0;
+	TIM_Cmd(TIM2, ENABLE);
+	while(GPIO_ReadInputDataBit(GPIOA, nIRQ))
+	{		
+		if(Flag.reach_1s)
+		{
+			Flag.reach_1s = 0;
+			char str[] = "Error: rx data timeout!";
+			UARTSend(str, sizeof(str));
+			return 0;
+		}		
+	}	
+	
+	//while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
+	ItStatus1 = SI4432_ReadReg(0x03);		//?????????
+	ItStatus2 = SI4432_ReadReg(0x04);		//?????????
+	//burst read
+	GPIO_ResetBits(GPIOA, nSEL);
+	SPI1_ReadWriteByte(0x7F);
+	for (int i = 0; i < 10; i++) 
+	{
+		rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
+	}
+	GPIO_SetBits(GPIOA, nSEL);
+	//enter ready mode
+	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+	return 1;
 }
 
 

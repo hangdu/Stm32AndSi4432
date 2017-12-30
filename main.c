@@ -71,6 +71,8 @@ int main(void)
 	
 	USART1_Init();
 	Timer2Init();
+	Timer3Init();
+	
 	
 	
   /* SPIy Config -------------------------------------------------------------*/
@@ -95,25 +97,14 @@ int main(void)
 		u8 returnValue = tx_data();	
 		if (returnValue == 1)
 		{
-			rx_data();
-			while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
-			ItStatus1 = SI4432_ReadReg(0x03);		//?????????
-			ItStatus2 = SI4432_ReadReg(0x04);		//?????????
-			//burst read
-			GPIO_ResetBits(GPIOA, nSEL);
-			SPI1_ReadWriteByte(0x7F);
-			char rx_buf1[10];
-			for (int i = 0; i < 10; i++) 
+			returnValue = rx_data();
+			if (returnValue == 1)
 			{
-				rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
-			}
-			GPIO_SetBits(GPIOA, nSEL);
-			//enter ready mode
-			SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
-			GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-			delay_ms(500);
-			GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-			delay_ms(3000);
+				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+				delay_ms(100);
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+			
+			}			
 		}
 		
 		

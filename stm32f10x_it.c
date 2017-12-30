@@ -66,6 +66,28 @@ void TIM2_IRQHandler()
     }
 }
 
+void TIM3_IRQHandler()
+{
+  if (TIM_GetITStatus(TIM3, TIM_IT_Update) != RESET)
+  {
+    TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+		u8 returnValue = tx_data();	
+		if (returnValue == 1)
+		{
+			returnValue = rx_data();
+			if (returnValue == 1)
+			{
+				UARTSend(rx_buf1,sizeof(rx_buf1));	
+				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+				delay_ms(100);
+				GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+				return;
+			}			
+		}			
+  }
+}
+
+
 /**
   * @brief  This function handles USARTx global interrupt request
   * @param  None
@@ -91,27 +113,30 @@ void USART1_IRQHandler(void)
 					u8 returnValue = tx_data();	
 					if (returnValue == 1)
 					{
-						rx_data();
-						while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
-						u8 ItStatus1 = SI4432_ReadReg(0x03);		//?????????
-						u8 ItStatus2 = SI4432_ReadReg(0x04);		//?????????
-						//burst read
-						GPIO_ResetBits(GPIOA, nSEL);
-						SPI1_ReadWriteByte(0x7F);
-						char rx_buf1[10];
-						for (int i = 0; i < 10; i++) 
+						returnValue = rx_data();
+						if (returnValue == 1)
 						{
-							rx_buf1[i] = SPI1_ReadWriteByte(0xFF);
-						}
-						GPIO_SetBits(GPIOA, nSEL);
-						//enter ready mode
-						SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
-						GPIO_ResetBits(GPIOC, GPIO_Pin_13);
-						delay_ms(500);
-						GPIO_SetBits(GPIOC, GPIO_Pin_13);	
-						delay_ms(3000);
-					}		
-        }			
+							UARTSend(rx_buf1,sizeof(rx_buf1));	
+							GPIO_ResetBits(GPIOC, GPIO_Pin_13);
+							delay_ms(100);
+							GPIO_SetBits(GPIOC, GPIO_Pin_13);	
+							return;
+						}			
+					}
+        }	
+
+				else if (i == '3')
+				{
+					//enable timer3
+					TIM_Cmd(TIM3, ENABLE);
+				}
+				
+				else if (i == '4')
+				{
+					//disable timer3
+					TIM_Cmd(TIM3, DISABLE);
+					TIM_SetCounter(TIM2, 9000);
+				}			
     }
 }
 

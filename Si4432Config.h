@@ -28,6 +28,7 @@
 #define  SI4432_PACKET_SENT_INTERRUPT	04
 extern u8 dt;
 extern unsigned char tx_test_data[10];
+extern char rx_buf1[10];
 
 	 
 typedef struct 
@@ -42,7 +43,7 @@ u8 SPI1_ReadWriteByte(u8 TxData);
 u8 SI4432_ReadReg(u8 addr);
 void SI4432_WriteReg(u8 addr, u8 value);
 u8 tx_data(void);
-void rx_data(void);
+u8 rx_data(void);
 void SI4432_init(void);
 
 
