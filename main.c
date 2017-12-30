@@ -68,7 +68,8 @@ int main(void)
   RCC_Configuration();
   /* GPIO configuration ------------------------------------------------------*/
   GPIO_Configuration(SPI_Mode_Master);
-	
+	/* Configure the Priority Grouping with 1 bit */
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	USART1_Init();
 	Timer2Init();
 	Timer3Init();
@@ -100,6 +101,7 @@ int main(void)
 			returnValue = rx_data();
 			if (returnValue == 1)
 			{
+				TX0_RX0;
 				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 				delay_ms(100);
 				GPIO_SetBits(GPIOC, GPIO_Pin_13);	
@@ -107,7 +109,7 @@ int main(void)
 			}			
 		}
 		
-		
+		TX0_RX0;
 		while(1);
 }
 

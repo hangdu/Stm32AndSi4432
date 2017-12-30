@@ -32,7 +32,7 @@ void Timer3Init()
 	
 	NVIC_InitTypeDef nvicStructure;
   nvicStructure.NVIC_IRQChannel = TIM3_IRQn;
-  nvicStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  nvicStructure.NVIC_IRQChannelPreemptionPriority = 2;
   nvicStructure.NVIC_IRQChannelSubPriority = 1;
   nvicStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&nvicStructure);

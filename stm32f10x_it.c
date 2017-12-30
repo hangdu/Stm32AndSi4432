@@ -116,6 +116,7 @@ void USART1_IRQHandler(void)
 						returnValue = rx_data();
 						if (returnValue == 1)
 						{
+							TX0_RX0;
 							UARTSend(rx_buf1,sizeof(rx_buf1));	
 							GPIO_ResetBits(GPIOC, GPIO_Pin_13);
 							delay_ms(100);
@@ -123,6 +124,7 @@ void USART1_IRQHandler(void)
 							return;
 						}			
 					}
+					TX0_RX0;
         }	
 
 				else if (i == '3')

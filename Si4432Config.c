@@ -53,7 +53,7 @@ u8 tx_data(void)
 	int test;
 	Flag.is_tx = 1;
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	// rf Ready mode
-	TX1_RX0;		//TX status
+	
 	delay_ms(5);		
 	
   //clear the contents of the RX FIFO
@@ -96,6 +96,7 @@ u8 tx_data(void)
 	ItStatus1 = SI4432_ReadReg(0x03);		//?????????
 	ItStatus2 = SI4432_ReadReg(0x04);		//?????????
 	test = GPIO_ReadInputDataBit(GPIOA, nIRQ);	
+	TX1_RX0;		//TX status
 	return 1;
 }
 
@@ -108,7 +109,7 @@ u8 rx_data(void)
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	//Ready Mode
 	delay_ms(5);		
 
-	TX0_RX1;		
+	
 	
 	//clear the contents of the RX FIFO
   //clear the contents of the TX FIFO.
@@ -133,7 +134,7 @@ u8 rx_data(void)
 			return 0;
 		}		
 	}	
-	
+	TX0_RX1;		
 	//while(GPIO_ReadInputDataBit(GPIOA, nIRQ));
 	ItStatus1 = SI4432_ReadReg(0x03);		//?????????
 	ItStatus2 = SI4432_ReadReg(0x04);		//?????????
@@ -147,6 +148,7 @@ u8 rx_data(void)
 	GPIO_SetBits(GPIOA, nSEL);
 	//enter ready mode
 	SI4432_WriteReg(0x07, SI4432_PWRSTATE_READY);	
+	
 	return 1;
 }
 
