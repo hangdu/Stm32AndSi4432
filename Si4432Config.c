@@ -82,7 +82,8 @@ u8 tx_data(void)
 		if(Flag.reach_1s)
 		{
 			Flag.reach_1s = 0;
-			char str[] = "Error: tx data timeout!";
+			//char str[] = "Error: tx data timeout!";
+			char str[2] = {0x00, 0x00};
 			UARTSend(str, sizeof(str));
 			return 0;
 		}		
@@ -129,7 +130,8 @@ u8 rx_data(void)
 		if(Flag.reach_1s)
 		{
 			Flag.reach_1s = 0;
-			char str[] = "Error: rx data timeout!";
+			//char str[] = "Error: rx data timeout!";
+			char str[2] = {0x00, 0x01};
 			UARTSend(str, sizeof(str));
 			return 0;
 		}		

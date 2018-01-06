@@ -1,7 +1,10 @@
 #include "Timer2Configuration.h"
 
+
+//Timer2 is for timeout time
 void Timer2Init()
 {
+	//period = 3 seconds
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	
 	NVIC_InitTypeDef nvicStructure;
@@ -13,7 +16,7 @@ void Timer2Init()
 	
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
   TIM_TimeBaseStructure.TIM_Period = 9000;
-  TIM_TimeBaseStructure.TIM_Prescaler = 8000;
+  TIM_TimeBaseStructure.TIM_Prescaler = 24000;
   TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
   TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -26,8 +29,12 @@ void Timer2Init()
   TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);	
 }
 
+
+
+//Timer3 is for asking RSSI at some frequency.
 void Timer3Init()
 {
+	//period is 4 seconds.
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
 	
 	NVIC_InitTypeDef nvicStructure;
@@ -39,7 +46,7 @@ void Timer3Init()
 	
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_TimeBaseStructure.TIM_Period = 9000;
-  TIM_TimeBaseStructure.TIM_Prescaler = 16000;
+  TIM_TimeBaseStructure.TIM_Prescaler = 32000;
   TIM_TimeBaseStructure.TIM_ClockDivision = 0x0;
   TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Down;
   TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);

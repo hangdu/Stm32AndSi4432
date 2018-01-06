@@ -66,7 +66,7 @@ void UARTSend(char *pucBuffer, unsigned long ulCount)
     //
     // Loop while there are more characters to send.
     //
-    while(ulCount != 1)
+    while(ulCount != 0)
     {
 			  char c = (uint16_t) *pucBuffer;
         USART_SendData(USART1, (uint16_t) *pucBuffer++);
