@@ -78,9 +78,10 @@ void TIM3_IRQHandler()
 			if (returnValue == 1)
 			{
 				//UARTSend(rx_buf1,sizeof(rx_buf1));	
-				char str[2];
+				char str[3];
 				str[0] = 0x01;
 				str[1] = rx_buf1[0];
+				str[2] = 0xFF;
 				UARTSend(str,sizeof(str));	
 				
 				GPIO_ResetBits(GPIOC, GPIO_Pin_13);
@@ -122,9 +123,10 @@ void USART1_IRQHandler(void)
 						if (returnValue == 1)
 						{
 							TX0_RX0;
-							char str[2];
+							char str[3];
 							str[0] = 0x01;
 							str[1] = rx_buf1[0];
+							str[2] = 0xFF;
 							//UARTSend(rx_buf1,sizeof(rx_buf1));	
 							UARTSend(str,sizeof(str));	
 							GPIO_ResetBits(GPIOC, GPIO_Pin_13);
